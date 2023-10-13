@@ -21,6 +21,20 @@ internal class Program
 
         builder.Services.AddTransient<ICookieStand, CookieStandService>();
 
+        builder.Services.AddEndpointsApiExplorer();
+
+        builder.Services.AddCors(options =>
+        {
+            options.AddDefaultPolicy(
+                policy =>
+                {
+                    policy.AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader();
+                }
+                );
+        });
+
         builder.Services.AddSwaggerGen(options =>
         {
             options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo()
@@ -31,6 +45,8 @@ internal class Program
         });
 
         var app = builder.Build();
+
+        app.UseCors();
 
         app.UseSwagger(options =>
         {
@@ -43,9 +59,15 @@ internal class Program
             aptions.RoutePrefix = string.Empty;
         });
 
+        app.UseHttpsRedirection();
+
+
+
+        app.UseAuthorization();
+
+
         app.MapControllers();
 
-        app.MapGet("/", () => "Hello World!");
 
         app.Run();
     }
